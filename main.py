@@ -83,6 +83,7 @@ def run_tip_adapter(cfg, cache_keys, cache_values, val_features, val_labels, tes
     print("\n-------- Evaluating on the test set. --------")
 
     # Zero-shot CLIP
+    # calculate accuracy  with best_beta and best_alpha on test set
     clip_logits = 100. * test_features @ clip_weights
     acc = cls_acc(clip_logits, test_labels)
     print("\n**** Zero-shot CLIP's test accuracy: {:.2f}. ****\n".format(acc))
@@ -96,6 +97,8 @@ def run_tip_adapter(cfg, cache_keys, cache_values, val_features, val_labels, tes
     print("**** Tip-Adapter's test accuracy: {:.2f}. ****\n".format(acc))
 
 # function definition of 'run_tip_adapter_F()'
+# clip model-->
+# train_loader_F-->
 def run_tip_adapter_F(cfg, cache_keys, cache_values, val_features, val_labels, test_features, test_labels, clip_weights, clip_model, train_loader_F):
     
     # Enable the cached keys to be learnable
