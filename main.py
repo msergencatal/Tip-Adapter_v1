@@ -7,10 +7,14 @@ import random
 import argparse
 # 'yaml' is a module for working with YAML (YAML Ain't Markup Language) files. YAML is a human-readable data serialization format.
 import yaml
-# 'tqdm' is a module for displaying progress bars in the terminal.
+# 'tqdm' is a module for displaying progress bars in the terminal. Importing the tqdm module and specifically the tqdm class from it.
 from tqdm import tqdm
 
+# Imports some fundamental PyTorch modules and classes
+# 'torch' is the main PyTorch module. It provides the fundamental data structures (tensors) and operations for building and training neural networks.
 import torch
+# 'torch.nn.functional' (imported as 'F') contains various functions that are not part of the 'torch.nn' module but are still essential for neural network operations. 
+# Common functions like activation functions (e.g., relu, sigmoid) are found here.
 import torch.nn.functional as F
 import torch.nn as nn
 import torchvision.transforms as transforms
