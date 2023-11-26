@@ -191,9 +191,10 @@ def main():
 
     # If cfg['dataset'] is, for instance, 'my_dataset', then cache_dir would be './caches/my_dataset'.
     cache_dir = os.path.join('./caches', cfg['dataset'])
-    #
+    # This code checks if the directory specified by cache_dir exists. If it does not exist, it creates it and any necessary parent directories. 
+    # If it already exists, it does nothing, thanks to exist_ok=True. 
     os.makedirs(cache_dir, exist_ok=True)
-    #
+    #  assigns the previously constructed cache_dir to the 'cache_dir' key in the configuration dictionary (cfg).
     cfg['cache_dir'] = cache_dir
 
     print("\nRunning configs.")
