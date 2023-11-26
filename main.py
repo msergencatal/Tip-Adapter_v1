@@ -22,11 +22,13 @@ import torch.nn as nn
 # These transformations can be applied to images before feeding them into a neural network
 import torchvision.transforms as transforms
 
-# Imports the build_dataset function from the datasets module. 
+# Imports the build_dataset function from the datasets/_init.py_ . 
 from datasets import build_dataset
-# Imports the build_data_loader function from the utils submodule within the datasets module.
+# Imports the build_data_loader function from the utils submodule(utils.py) within the datasets module.
 from datasets.utils import build_data_loader
+# Imports  the CLIP module
 import clip
+# imports all names (functions, classes, variables) from the utils.py
 from utils import *
 
 
