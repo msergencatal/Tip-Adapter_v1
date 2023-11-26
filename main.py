@@ -98,7 +98,7 @@ def run_tip_adapter(cfg, cache_keys, cache_values, val_features, val_labels, tes
 
 # function definition of 'run_tip_adapter_F()'
 # clip model--> pre-trained CLIP model
-# train_loader_F--> 
+# train_loader_F--> data from training set
 def run_tip_adapter_F(cfg, cache_keys, cache_values, val_features, val_labels, test_features, test_labels, clip_weights, clip_model, train_loader_F):
     
     # Enable the cached keys to be learnable
@@ -181,10 +181,15 @@ def main():
 
     # Load config file
     args = get_arguments()
+    # Check if the specified configuration file exists
     assert (os.path.exists(args.config))
     
+    # open(args.config, 'r'): This part opens the file specified in args.config in read mode ('r'). It returns a file object.
+    # yaml.load(..., Loader=yaml.Loader): This uses the yaml library to load the content of the opened file. The Loader=yaml.
+    # Loader parameter specifies the YAML loader to use. The yaml.Loader is part of the PyYAML library and is used for loading YAML data.
     cfg = yaml.load(open(args.config, 'r'), Loader=yaml.Loader)
 
+    # If cfg['dataset'] is, for instance, 'my_dataset', then cache_dir would be './caches/my_dataset'.
     cache_dir = os.path.join('./caches', cfg['dataset'])
     os.makedirs(cache_dir, exist_ok=True)
     cfg['cache_dir'] = cache_dir
