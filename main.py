@@ -45,6 +45,11 @@ def get_arguments():
 # cfg--> configurations of each datasets from configs file.(eurosat.yaml, food101.yaml ...)
 # cache_keys--> Ftrain (CLIP vision encoder output of cache model)
 # cache_values--> Ltrain (one hot encoded labels of cache model))
+# val_features--> visual features from the validation set for hyperparameter searching.
+# val_labels--> labels from the validation set for hyperparameter searching.
+# test_features--> visual features from the test set
+# test_labels--> labels from the test set
+# clip_weights-->
 def run_tip_adapter(cfg, cache_keys, cache_values, val_features, val_labels, test_features, test_labels, clip_weights):
     
     print("\n-------- Searching hyperparameters on the val set. --------")
