@@ -16,6 +16,8 @@ def cls_acc(output, target, topk=1):
 
 
 def clip_classifier(classnames, template, clip_model):
+    # gradients are not added to the computation graph, which can save memory and improve performance.
+    # It's common when working with pre-trained models during evaluation, as you usually don't need to compute gradients for weights during this phase. 
     with torch.no_grad():
         clip_weights = []
 
