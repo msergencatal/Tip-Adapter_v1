@@ -16,10 +16,15 @@ import torch
 # 'torch.nn.functional' (imported as 'F') contains various functions that are not part of the 'torch.nn' module but are still essential for neural network operations. 
 # Common functions like activation functions (e.g., relu, sigmoid) are found here.
 import torch.nn.functional as F
+# 'torch.nn' is PyTorch's neural network module. It includes classes for defining neural network architectures, layers, loss functions, and more.
 import torch.nn as nn
+# 'torchvision.transforms' provides a set of image transformations commonly used in computer vision tasks. 
+# These transformations can be applied to images before feeding them into a neural network
 import torchvision.transforms as transforms
 
+# Imports the build_dataset function from the datasets module. 
 from datasets import build_dataset
+# Imports the build_data_loader function from the utils submodule within the datasets module.
 from datasets.utils import build_data_loader
 import clip
 from utils import *
