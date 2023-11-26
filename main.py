@@ -63,11 +63,15 @@ def run_tip_adapter(cfg, cache_keys, cache_values, val_features, val_labels, tes
     print("\n**** Zero-shot CLIP's val accuracy: {:.2f}. ****\n".format(acc))
 
     # Tip-Adapter
+    # take beta and alpha from cfg
     beta, alpha = cfg['init_beta'], cfg['init_alpha']
-    
+
+    # visual features*Ftrain
     affinity = val_features @ cache_keys
-    cache_logits = ((-1) * (beta - beta * affinity)).exp() @ cache_values
-    
+    # activation function of tip-adapter
+    cache_logits = ((-1) * (beta - beta * affinity)).exp() @ cache_values        
+
+    # Tip-adapter output logits
     tip_logits = clip_logits + cache_logits * alpha
     acc = cls_acc(tip_logits, val_labels)
     print("**** Tip-Adapter's val accuracy: {:.2f}. ****\n".format(acc))
