@@ -31,7 +31,7 @@ import clip
 # imports all names (functions, classes, variables) from the utils.py
 from utils import *
 
-
+# function definition of 'get_arguments()'
 def get_arguments():
 
     parser = argparse.ArgumentParser()
@@ -40,7 +40,7 @@ def get_arguments():
 
     return args
 
-
+# function definition of 'run_tip_adapter()'
 def run_tip_adapter(cfg, cache_keys, cache_values, val_features, val_labels, test_features, test_labels, clip_weights):
     
     print("\n-------- Searching hyperparameters on the val set. --------")
@@ -79,7 +79,7 @@ def run_tip_adapter(cfg, cache_keys, cache_values, val_features, val_labels, tes
     acc = cls_acc(tip_logits, test_labels)
     print("**** Tip-Adapter's test accuracy: {:.2f}. ****\n".format(acc))
 
-
+# function definition of 'run_tip_adapter_F()'
 def run_tip_adapter_F(cfg, cache_keys, cache_values, val_features, val_labels, test_features, test_labels, clip_weights, clip_model, train_loader_F):
     
     # Enable the cached keys to be learnable
