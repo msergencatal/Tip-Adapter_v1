@@ -205,6 +205,7 @@ def main():
     clip_model.eval()
 
     # Prepare dataset
+    # Subsequent calls to random functions in your script will produce the same sequence of random numbers every time you run the script.
     random.seed(1)
     torch.manual_seed(1)
     
@@ -214,6 +215,13 @@ def main():
     val_loader = build_data_loader(data_source=dataset.val, batch_size=64, is_train=False, tfm=preprocess, shuffle=False)
     test_loader = build_data_loader(data_source=dataset.test, batch_size=64, is_train=False, tfm=preprocess, shuffle=False)
 
+    # transforms.RandomResizedCrop(size=224, scale=(0.5, 1), interpolation=transforms.InterpolationMode.BICUBIC): Randomly crops and resizes the input image. 
+    # The size is set to 224 pixels, and the crop scale is randomly chosen between 0.5 and 1. Bicubic interpolation is used for resizing.
+    # transforms.RandomHorizontalFlip(p=0.5): Randomly flips the input image horizontally with a probability of 0.5.
+    # transforms.ToTensor(): Converts the input image to a PyTorch tensor. This is a necessary step before feeding the image into a deep learning model.
+    # transforms.Normalize(mean=(0.48145466, 0.4578275, 0.40821073), std=(0.26862954, 0.26130258, 0.27577711)): 
+    # Normalizes the tensor by subtracting the mean and dividing by the standard deviation. 
+    # The specified mean and std values are often precomputed based on the dataset statistics to standardize the input data.
     train_tranform = transforms.Compose([
         transforms.RandomResizedCrop(size=224, scale=(0.5, 1), interpolation=transforms.InterpolationMode.BICUBIC),
         transforms.RandomHorizontalFlip(p=0.5),
@@ -246,6 +254,7 @@ def main():
     # ------------------------------------------ Tip-Adapter-F ------------------------------------------
     run_tip_adapter_F(cfg, cache_keys, cache_values, val_features, val_labels, test_features, test_labels, clip_weights, clip_model, train_loader_F)
            
-
+# This means that the main() function will only be called if the script is executed directly. 
+# If the script is imported as a module elsewhere, the main() function won't be automatically executed.
 if __name__ == '__main__':
     main()
