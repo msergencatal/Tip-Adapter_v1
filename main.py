@@ -49,7 +49,7 @@ def get_arguments():
 # val_labels--> labels from the validation set for hyperparameter searching.
 # test_features--> visual features from the test set
 # test_labels--> labels from the test set
-# clip_weights-->
+# clip_weights--> CLIP textual features (Wc)
 def run_tip_adapter(cfg, cache_keys, cache_values, val_features, val_labels, test_features, test_labels, clip_weights):
     
     print("\n-------- Searching hyperparameters on the val set. --------")
