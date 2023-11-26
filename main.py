@@ -1,8 +1,13 @@
 # Imports several standard Python libraries and third-party modules. 
+# 'os' is a module that provides a way of interacting with the operating system. It offers functions for file and directory manipulation, environment variables, and more.
 import os
+# 'random' is a module for generating pseudorandom numbers. It provides functions for various randomization tasks.
 import random
+# 'argparse' is a module for parsing command-line arguments in a user-friendly way. It allows you to define command-line interfaces for your scripts.
 import argparse
+# 'yaml' is a module for working with YAML (YAML Ain't Markup Language) files. YAML is a human-readable data serialization format.
 import yaml
+# 'tqdm' is a module for displaying progress bars in the terminal.
 from tqdm import tqdm
 
 import torch
