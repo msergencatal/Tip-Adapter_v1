@@ -47,7 +47,7 @@ def get_arguments():
 # cache_values--> Ltrain (one hot encoded labels of cache model))
 # val_features--> visual features from the validation set for hyperparameter searching.
 # val_labels--> labels from the validation set for hyperparameter searching.
-# test_features--> visual features from the test set
+# test_features--> visual features from the test set (ftest)
 # test_labels--> labels from the test set
 # clip_weights--> CLIP textual features (Wc)
 def run_tip_adapter(cfg, cache_keys, cache_values, val_features, val_labels, test_features, test_labels, clip_weights):
@@ -55,6 +55,9 @@ def run_tip_adapter(cfg, cache_keys, cache_values, val_features, val_labels, tes
     print("\n-------- Searching hyperparameters on the val set. --------")
 
     # Zero-shot CLIP
+    # calculates the logits using CLIP, computes the classification accuracy on validation data, and prints the accuracy.
+    # calculates the dot product between 'val_features' and the transpose of 'clip_weights'. The result is scaled by 100.
+    # 'clip_logits' (the predicted logits) and 'val_labels' (the true labels)
     clip_logits = 100. * val_features @ clip_weights
     acc = cls_acc(clip_logits, val_labels)
     print("\n**** Zero-shot CLIP's val accuracy: {:.2f}. ****\n".format(acc))
