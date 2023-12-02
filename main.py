@@ -97,7 +97,7 @@ def run_tip_adapter(cfg, cache_keys, cache_values, val_features, val_labels, tes
     print("**** Tip-Adapter's test accuracy: {:.2f}. ****\n".format(acc))
 
 # function definition of 'run_tip_adapter_F()'
-# clip model--> pre-trained CLIP model
+# clip_model--> pre-trained CLIP model
 # train_loader_F--> data from training set
 def run_tip_adapter_F(cfg, cache_keys, cache_values, val_features, val_labels, test_features, test_labels, clip_weights, clip_model, train_loader_F):
     
