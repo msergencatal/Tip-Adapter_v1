@@ -61,10 +61,10 @@ def build_cache_model(cfg, clip_model, train_loader_cache):
                 # torch.cat(train_features, dim=0)--> Concatenate a list of tensors along a specified dimension.
                 # torch.cat(train_features, dim=0).unsqueeze(0)--> Adds a new dimension at the beginning of the tensor.
                 # The purpose of adding an extra dimension with unsqueeze(0) might depend on the specific requirements of your code. 
-                # It's common to add a batch dimension when dealing with deep learning models, where the first dimension often represents the batch size.
+                # It's common to add a batch dimension when dealing with deep learning models, where the first dimension represents the num of epochs.
                 cache_keys.append(torch.cat(train_features, dim=0).unsqueeze(0))  
             
-        #
+        # mean of all augmented features.
         cache_keys = torch.cat(cache_keys, dim=0).mean(dim=0)    #[num of total images x 1024]
         # computes the L2 norm along the last dimension and normalizes each row of the cache_keys tensor by dividing it by its L2 norm.
         cache_keys /= cache_keys.norm(dim=-1, keepdim=True)    #[num of total images x 1024]
