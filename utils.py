@@ -53,8 +53,8 @@ def build_cache_model(cfg, clip_model, train_loader_cache):
                 print('Augment Epoch: {:} / {:}'.format(augment_idx, cfg['augment_epoch']))
                 for i, (images, target) in enumerate(tqdm(train_loader_cache)):
                     images = images.cuda()     # Move the tensor to the GPU. Now 'images' is on the GPU, and operations involving 'images' will be executed on the GPU.                     
-                    image_features = clip_model.encode_image(images)  # Extract image features from the CLIP vision encoder.[1 x 512]
-                    train_features.append(image_features)    #The extracted image_features are then appended to the train_features list.[num of total images x 512]
+                    image_features = clip_model.encode_image(images)  # Extract image features from the CLIP vision encoder.[batch size x 1024]
+                    train_features.append(image_features)    #The extracted image_features are then appended to the train_features list.
                     if augment_idx == 0:     # This condition executed only the first iteration.
                         target = target.cuda()    # Move the target to the GPU.
                         cache_values.append(target)    #The target appended to the cache value list. 
@@ -62,7 +62,7 @@ def build_cache_model(cfg, clip_model, train_loader_cache):
                 # torch.cat(train_features, dim=0).unsqueeze(0)--> Adds a new dimension at the beginning of the tensor.
                 # The purpose of adding an extra dimension with unsqueeze(0) might depend on the specific requirements of your code. 
                 # It's common to add a batch dimension when dealing with deep learning models, where the first dimension often represents the batch size.
-                cache_keys.append(torch.cat(train_features, dim=0).unsqueeze(0))    #[num of total images x 512]
+                cache_keys.append(torch.cat(train_features, dim=0).unsqueeze(0))  
             
         #
         cache_keys = torch.cat(cache_keys, dim=0).mean(dim=0)    #[num of total images x 1024]
