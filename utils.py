@@ -64,9 +64,12 @@ def build_cache_model(cfg, clip_model, train_loader_cache):
                 # It's common to add a batch dimension when dealing with deep learning models, where the first dimension often represents the batch size.
                 cache_keys.append(torch.cat(train_features, dim=0).unsqueeze(0))    #[num of total images x 512]
             
-        cache_keys = torch.cat(cache_keys, dim=0).mean(dim=0)    #[num of total images x 512]
-        cache_keys /= cache_keys.norm(dim=-1, keepdim=True)    #[num of total images x 512]
-        cache_keys = cache_keys.permute(1, 0)    #[512 x num of total images]
+        #
+        cache_keys = torch.cat(cache_keys, dim=0).mean(dim=0)    #[num of total images x 1024]
+        # computes the L2 norm along the last dimension and normalizes each row of the cache_keys tensor by dividing it by its L2 norm.
+        cache_keys /= cache_keys.norm(dim=-1, keepdim=True)    #[num of total images x 1024]
+        # take the transpose of the tensor
+        cache_keys = cache_keys.permute(1, 0)    #[1024 x num of total images]
         #F.one_hot(...)--> converts each element in the input tensor to a one-hot vector representation
         # .half()--> converts the data type of the tensor to half-precision floating-point format (float16). 
         cache_values = F.one_hot(torch.cat(cache_values, dim=0)).half()    #[num of total images x N]
@@ -77,7 +80,7 @@ def build_cache_model(cfg, clip_model, train_loader_cache):
     # take the values if the cache keys and values were already created before. load_cache=True.
     else:
         # load keys and cache values respectively from the directory(from dataset.yaml)
-        cache_keys = torch.load(cfg['cache_dir'] + '/keys_' + str(cfg['shots']) + "shots.pt")    #[512 x num of total images]
+        cache_keys = torch.load(cfg['cache_dir'] + '/keys_' + str(cfg['shots']) + "shots.pt")    #[1024 x num of total images]
         cache_values = torch.load(cfg['cache_dir'] + '/values_' + str(cfg['shots']) + "shots.pt")     #[num of total images x N]
 
     return cache_keys, cache_values
