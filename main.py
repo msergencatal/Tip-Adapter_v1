@@ -171,12 +171,15 @@ def run_tip_adapter_F(cfg, cache_keys, cache_values, val_features, val_labels, t
             optimizer.step()    # Update the model parameters based on the computed gradients.
             scheduler.step()    # Update the learning rate schedule during training.
 
+        # Retrieve the current learning rate from the learning rate scheduler.
         current_lr = scheduler.get_last_lr()[0]
         print('LR: {:.6f}, Acc: {:.4f} ({:}/{:}), Loss: {:.4f}'.format(current_lr, correct_samples / all_samples, correct_samples, all_samples, sum(loss_list)/len(loss_list)))
 
         # Eval
+        # Set the adapter model in evaluation mode.
         adapter.eval()
 
+        # Calculate the accuracy
         affinity = adapter(test_features)
         cache_logits = ((-1) * (beta - beta * affinity)).exp() @ cache_values
         clip_logits = 100. * test_features @ clip_weights
@@ -184,11 +187,14 @@ def run_tip_adapter_F(cfg, cache_keys, cache_values, val_features, val_labels, t
         acc = cls_acc(tip_logits, test_labels)
 
         print("**** Tip-Adapter-F's test accuracy: {:.2f}. ****\n".format(acc))
+        # Find the highest accuracy and save the weights for this accuracy value.
         if acc > best_acc:
             best_acc = acc
             best_epoch = train_idx
             torch.save(adapter.weight, cfg['cache_dir'] + "/best_F_" + str(cfg['shots']) + "shots.pt")
-    
+        # end of one epoch.
+
+    # Load back the weight for the best accuracy.
     adapter.weight = torch.load(cfg['cache_dir'] + "/best_F_" + str(cfg['shots']) + "shots.pt")
     print(f"**** After fine-tuning, Tip-Adapter-F's best test accuracy: {best_acc:.2f}, at epoch: {best_epoch}. ****\n")
 
