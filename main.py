@@ -98,48 +98,78 @@ def run_tip_adapter(cfg, cache_keys, cache_values, val_features, val_labels, tes
 
 # function definition of 'run_tip_adapter_F()'
 # clip_model--> pre-trained CLIP model
-# train_loader_F--> data from training set
+# train_loader_F--> data from the training set
 def run_tip_adapter_F(cfg, cache_keys, cache_values, val_features, val_labels, test_features, test_labels, clip_weights, clip_model, train_loader_F):
     
     # Enable the cached keys to be learnable
+    # `cache_keys` is a PyTorch tensor    [1024 x num of images]
+    # The `nn.Linear` creates a linear layer with the specified input and output sizes.
+    # - `cache_keys.shape[0]` is the input size (1024)
+    # - `cache_keys.shape[1]` is the output size (number of images)
+    # - `bias=False` means that the linear layer will not have a bias term.
+    # .to(clip_model.dtype) sets the data type of the layer to match the data type of `clip_model`.
+    # .cuda() moves the layer to the GPU (assuming you have a GPU available).
     adapter = nn.Linear(cache_keys.shape[0], cache_keys.shape[1], bias=False).to(clip_model.dtype).cuda()
     adapter.weight = nn.Parameter(cache_keys.t())
-    
+
+    # The optimizer is created using the AdamW algorithm, which is an extension of Adam with weight decay.
+    # adapter.parameters() --> provide the parameters (weights) of the adapter linear layer to the optimizer. 
+    # This is necessary so that the optimizer knows which parameters to update during the optimization process.
+    # lr=cfg['lr'] --> sets the learning rate for the optimizer. The learning rate is a hyperparameter that controls the step size during optimization.
+    # eps=1e-4 --> is the epsilon parameter, a small value added to the denominator for numerical stability.
     optimizer = torch.optim.AdamW(adapter.parameters(), lr=cfg['lr'], eps=1e-4)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, cfg['train_epoch'] * len(train_loader_F))
     
+    # optimizer --> is the AdamW optimizer that you created earlier.
+    # train_epoch --> is the number of training epochs specified in the configuration.
+    # len(train_loader_F) --> is the total number of batches in your training data loader for a single epoch.
+    # The Cosine Annealing LR scheduler gradually reduces the learning rate in a cosine-shaped manner over the specified number of total training steps.
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, cfg['train_epoch'] * len(train_loader_F))
+
+    # initialize the beta, alfa, best_acc and best_epoch.
     beta, alpha = cfg['init_beta'], cfg['init_alpha']
     best_acc, best_epoch = 0.0, 0
 
     for train_idx in range(cfg['train_epoch']):
         # Train
+        # The model is set to training mode.
         adapter.train()
+        # Variables for holding the num of correct samples and all samples.
         correct_samples, all_samples = 0, 0
+        # Variable for holding the losses.
         loss_list = []
         print('Train Epoch: {:} / {:}'.format(train_idx, cfg['train_epoch']))
 
         for i, (images, target) in enumerate(tqdm(train_loader_F)):
             images, target = images.cuda(), target.cuda()
             with torch.no_grad():
+                # Construct CLIP image features.
                 image_features = clip_model.encode_image(images)
+                # Normalize features with L2 norm.
                 image_features /= image_features.norm(dim=-1, keepdim=True)
 
+            # Calculate the affinity score with the trainable adapter.
             affinity = adapter(image_features)
             cache_logits = ((-1) * (beta - beta * affinity)).exp() @ cache_values
             clip_logits = 100. * image_features @ clip_weights
             tip_logits = clip_logits + cache_logits * alpha
 
+            # calculate the cross-entropy loss between the tip_logits and the target labels. 
             loss = F.cross_entropy(tip_logits, target)
-
+            # Calculate accuracy.
             acc = cls_acc(tip_logits, target)
+            # Num of correct samples.
             correct_samples += acc / 100 * len(tip_logits)
+            # Num of all samples.
             all_samples += len(tip_logits)
+            # This is commonly done in training loops to keep track of the losses for each iteration (or batch) during an epoch.
             loss_list.append(loss.item())
 
+            # Zeroing out the gradients ensures that the gradients from the previous batch do not accumulate and  
+            # affect the parameter updates for the current batch, preventing unwanted interference between batches.
             optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-            scheduler.step()
+            loss.backward()    #  Compute gradients with respect to the parameters.
+            optimizer.step()    # Update the model parameters based on the computed gradients.
+            scheduler.step()    # Update the learning rate schedule during training.
 
         current_lr = scheduler.get_last_lr()[0]
         print('LR: {:.6f}, Acc: {:.4f} ({:}/{:}), Loss: {:.4f}'.format(current_lr, correct_samples / all_samples, correct_samples, all_samples, sum(loss_list)/len(loss_list)))
