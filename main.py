@@ -143,15 +143,15 @@ def run_tip_adapter_F(cfg, cache_keys, cache_values, val_features, val_labels, t
             images, target = images.cuda(), target.cuda()
             with torch.no_grad():
                 # Construct CLIP image features.
-                image_features = clip_model.encode_image(images)
+                image_features = clip_model.encode_image(images)    # [num of batch size x 1024]
                 # Normalize features with L2 norm.
                 image_features /= image_features.norm(dim=-1, keepdim=True)
 
             # Calculate the affinity score with the trainable adapter.
-            affinity = adapter(image_features)
-            cache_logits = ((-1) * (beta - beta * affinity)).exp() @ cache_values
-            clip_logits = 100. * image_features @ clip_weights
-            tip_logits = clip_logits + cache_logits * alpha
+            affinity = adapter(image_features)    # [num of batch size x 1632]
+            cache_logits = ((-1) * (beta - beta * affinity)).exp() @ cache_values    # [num of batch size x 102]
+            clip_logits = 100. * image_features @ clip_weights    # [num of batch size x 102]
+            tip_logits = clip_logits + cache_logits * alpha    # [num of batch size x 102]
 
             # calculate the cross-entropy loss between the tip_logits and the target labels. 
             loss = F.cross_entropy(tip_logits, target)
@@ -180,10 +180,10 @@ def run_tip_adapter_F(cfg, cache_keys, cache_values, val_features, val_labels, t
         adapter.eval()
 
         # Calculate the accuracy
-        affinity = adapter(test_features)
-        cache_logits = ((-1) * (beta - beta * affinity)).exp() @ cache_values
-        clip_logits = 100. * test_features @ clip_weights
-        tip_logits = clip_logits + cache_logits * alpha
+        affinity = adapter(test_features) # [2463 x 1632]]
+        cache_logits = ((-1) * (beta - beta * affinity)).exp() @ cache_values    # [2463 x 102]
+        clip_logits = 100. * test_features @ clip_weights    # [2463 x 102]
+        tip_logits = clip_logits + cache_logits * alpha    # [2463 x 102]
         acc = cls_acc(tip_logits, test_labels)
 
         print("**** Tip-Adapter-F's test accuracy: {:.2f}. ****\n".format(acc))
@@ -205,10 +205,10 @@ def run_tip_adapter_F(cfg, cache_keys, cache_values, val_features, val_labels, t
 
     print("\n-------- Evaluating on the test set. --------")
    
-    affinity = adapter(test_features)
-    cache_logits = ((-1) * (best_beta - best_beta * affinity)).exp() @ cache_values
+    affinity = adapter(test_features)    # [2463 x 1632]
+    cache_logits = ((-1) * (best_beta - best_beta * affinity)).exp() @ cache_values    # [2463 x 102]
     
-    tip_logits = clip_logits + cache_logits * best_alpha
+    tip_logits = clip_logits + cache_logits * best_alpha    # [2463 x 102]
     acc = cls_acc(tip_logits, test_labels)
     print("**** Tip-Adapter-F's test accuracy: {:.2f}. ****\n".format(max(best_acc, acc)))
 
