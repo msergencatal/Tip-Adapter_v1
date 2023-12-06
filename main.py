@@ -204,7 +204,7 @@ def run_tip_adapter_F(cfg, cache_keys, cache_values, val_features, val_labels, t
     best_beta, best_alpha = search_hp(cfg, cache_keys, cache_values, val_features, val_labels, clip_weights, adapter=adapter)
 
     print("\n-------- Evaluating on the test set. --------")
-   
+    # Evaluation on test set with best beta, best alpha and best weight.
     affinity = adapter(test_features)    # [2463 x 1632]
     cache_logits = ((-1) * (best_beta - best_beta * affinity)).exp() @ cache_values    # [2463 x 102]
     
